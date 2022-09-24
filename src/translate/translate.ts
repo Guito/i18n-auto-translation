@@ -65,6 +65,11 @@ export abstract class Translate {
       existingTranslation,
       fileForTranslation
     ) as JSONObj;
+    if (argv.testKeys) {
+      console.log('The following lines would have been deleted:');
+      console.log(diffForDeletion);
+      return;
+    }
     if (Object.keys(diffForDeletion).length !== 0) {
       const content = extend(true, existingTranslation, diffForDeletion) as JSONObj;
       this.writeToFile(content, saveTo, `Unnecessary lines deleted for: ${saveTo}`);
@@ -85,6 +90,11 @@ export abstract class Translate {
       return;
     }
     const valuesForTranslation: string[] = this.getValuesForTranslation(diffForTranslation);
+    if (argv.testKeys) {
+      console.log(`The following keys would have been translated:`);
+      console.log(diffForTranslation);
+      return;
+    }
     this.callTranslateAPI(valuesForTranslation, diffForTranslation, saveTo);
   };
 

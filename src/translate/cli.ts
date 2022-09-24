@@ -11,6 +11,7 @@ interface Arguments {
   to: string;
   override: boolean;
   baseName: string;
+  testKeys: boolean;
 }
 
 export const argv: Arguments = yargs(process.argv.slice(2))
@@ -78,6 +79,12 @@ export const argv: Arguments = yargs(process.argv.slice(2))
       alias: 'b',
       description: 'Base name for the file translations',
       default: '',
+    },
+    testKeys: {
+      type: 'boolean',
+      alias: 'k',
+      description: 'When true, does not translate, only shows the keys to translate.',
+      default: false,
     },
   })
   .parseSync();
