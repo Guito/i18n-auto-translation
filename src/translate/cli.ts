@@ -10,6 +10,7 @@ interface Arguments {
   from: string;
   to: string;
   override: boolean;
+  baseName: string;
 }
 
 export const argv: Arguments = yargs(process.argv.slice(2))
@@ -23,6 +24,7 @@ export const argv: Arguments = yargs(process.argv.slice(2))
         'azure-official',
         'azure-rapid',
         'deep-rapid',
+        'deepl',
         'just-rapid',
         'lecto-rapid',
         'lingvanex-rapid',
@@ -70,6 +72,12 @@ export const argv: Arguments = yargs(process.argv.slice(2))
       alias: 'o',
       description: 'Override all created i18n JSON files.',
       default: false,
+    },
+    baseName: {
+      type: 'string',
+      alias: 'b',
+      description: 'Base name for the file translations',
+      default: '',
     },
   })
   .parseSync();

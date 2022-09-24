@@ -8,7 +8,7 @@ import { argv } from './cli';
 import { JSONObj } from './payload';
 
 export abstract class Translate {
-  protected static readonly sentenceDelimiter: string = '\n{|}\n';
+  static readonly sentenceDelimiter: string = '\n{|}\n';
 
   public translate = (): void => {
     if (argv.filePath && argv.dirPath)
@@ -35,8 +35,8 @@ export abstract class Translate {
     try {
       const fileForTranslation = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as JSONObj;
       const saveTo: string = path.join(
-        filePath.substring(0, filePath.lastIndexOf('/')),
-        `${argv.to}.json`
+        path.dirname(filePath),
+        `${argv.basename !== '' ? `${argv.baseName}-` : ''}${argv.to}.json`
       );
       if (argv.override || !fs.existsSync(saveTo))
         this.translationDoesNotExists(fileForTranslation, saveTo);
@@ -158,9 +158,11 @@ export abstract class Translate {
   };
 
   private writeToFile = (content: JSONObj, saveTo: string, message: string): void => {
-    fs.writeFile(saveTo, JSON.stringify(content, null, 2), (error) => {
-      if (error) console.log(error.message);
-      else console.log(message);
-    });
+    try {
+      fs.writeFileSync(saveTo, JSON.stringify(content, null, 2));
+    } catch (e: any) {
+      console.log(e);
+    }
+    console.log(message);
   };
 }

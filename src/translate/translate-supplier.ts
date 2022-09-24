@@ -7,12 +7,14 @@ import { LectoRapidAPI } from './providers/lecto-rapid-api';
 import { LingvanexRapidAPI } from './providers/lingvanex-rapid-api';
 import { NLPRapidAPI } from './providers/nlp-rapid-api';
 import { Translate } from './translate';
+import { DeeplAPI } from './providers/deepl-api';
 
 interface Providers {
   'google-official': GoogleOfficialAPI;
   'azure-official': AzureOfficialAPI;
   'azure-rapid': AzureRapidAPI;
   'deep-rapid': DeepRapidAPI;
+  deepl: DeeplAPI;
   'just-rapid': JustRapidAPI;
   'lecto-rapid': LectoRapidAPI;
   'lingvanex-rapid': LingvanexRapidAPI;
@@ -25,6 +27,7 @@ export class TranslateSupplier {
     'azure-official': new AzureOfficialAPI(),
     'azure-rapid': new AzureRapidAPI(),
     'deep-rapid': new DeepRapidAPI(),
+    deepl: new DeeplAPI(),
     'just-rapid': new JustRapidAPI(),
     'lecto-rapid': new LectoRapidAPI(),
     'lingvanex-rapid': new LingvanexRapidAPI(),
