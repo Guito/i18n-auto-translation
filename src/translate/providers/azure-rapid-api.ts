@@ -6,37 +6,33 @@ import { AzureTranslateResponse, JSONObj } from '../payload';
 import { Translate } from '../translate';
 
 export class AzureRapidAPI extends Translate {
-  private static readonly endpoint: string = 'microsoft-translator-text.p.rapidapi.com';
-  private static readonly axiosConfig: AxiosRequestConfig = {
-    headers: {
-      'X-ClientTraceId': uuid(),
-      'X-RapidAPI-Host': AzureRapidAPI.endpoint,
-      'X-RapidAPI-Key': argv.key,
-      'Content-type': 'application/json',
-    },
-    params: {
-      'api-version': '3.0',
-      from: argv.from,
-      to: argv.to,
-    },
-    responseType: 'json',
-  };
+    private static readonly endpoint: string = 'microsoft-translator-text.p.rapidapi.com';
+    private static readonly axiosConfig: AxiosRequestConfig = {
+        headers: {
+            'X-ClientTraceId': uuid(),
+            'X-RapidAPI-Host': AzureRapidAPI.endpoint,
+            'X-RapidAPI-Key': argv.key,
+            'Content-type': 'application/json'
+        },
+        params: {
+            'api-version': '3.0',
+            from: argv.from,
+            to: argv.to
+        },
+        responseType: 'json'
+    };
 
-  protected callTranslateAPI = (
-    valuesForTranslation: string[],
-    originalObject: JSONObj,
-    saveTo: string
-  ): void => {
-    axios
-      .post(
-        `https://${AzureRapidAPI.endpoint}/translate`,
-        [{ text: encode(valuesForTranslation.join(Translate.sentenceDelimiter)) }],
-        AzureRapidAPI.axiosConfig
-      )
-      .then((response) => {
+    protected callTranslateAPI = async (
+        valuesForTranslation: string[],
+        originalObject: JSONObj,
+        saveTo: string
+    ): Promise<void> => {
+        const response = await axios.post(
+            `https://${AzureRapidAPI.endpoint}/translate`,
+            [{ text: encode(valuesForTranslation.join(Translate.sentenceDelimiter)) }],
+            AzureRapidAPI.axiosConfig
+        );
         const value = (response as AzureTranslateResponse).data[0].translations[0].text;
         this.saveTranslation(decode(value), originalObject, saveTo);
-      })
-      .catch((error) => this.printAxiosError(error as AxiosError, saveTo));
-  };
+    };
 }

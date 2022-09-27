@@ -6,37 +6,33 @@ import { AzureTranslateResponse, JSONObj } from '../payload';
 import { Translate } from '../translate';
 
 export class AzureOfficialAPI extends Translate {
-  private static readonly endpoint: string = 'api.cognitive.microsofttranslator.com';
-  private static readonly axiosConfig: AxiosRequestConfig = {
-    headers: {
-      'Ocp-Apim-Subscription-Key': argv.key,
-      'Ocp-Apim-Subscription-Region': argv.region,
-      'Content-type': 'application/json',
-      'X-ClientTraceId': uuid(),
-    },
-    params: {
-      'api-version': '3.0',
-      from: argv.from,
-      to: argv.to,
-    },
-    responseType: 'json',
-  };
+    private static readonly endpoint: string = 'api.cognitive.microsofttranslator.com';
+    private static readonly axiosConfig: AxiosRequestConfig = {
+        headers: {
+            'Ocp-Apim-Subscription-Key': argv.key,
+            'Ocp-Apim-Subscription-Region': argv.region,
+            'Content-type': 'application/json',
+            'X-ClientTraceId': uuid()
+        },
+        params: {
+            'api-version': '3.0',
+            from: argv.from,
+            to: argv.to
+        },
+        responseType: 'json'
+    };
 
-  protected callTranslateAPI = (
-    valuesForTranslation: string[],
-    originalObject: JSONObj,
-    saveTo: string
-  ): void => {
-    axios
-      .post(
-        `https://${AzureOfficialAPI.endpoint}/translate`,
-        [{ text: encode(valuesForTranslation.join(Translate.sentenceDelimiter)) }],
-        AzureOfficialAPI.axiosConfig
-      )
-      .then((response) => {
+    protected callTranslateAPI = async (
+        valuesForTranslation: string[],
+        originalObject: JSONObj,
+        saveTo: string
+    ): Promise<void> => {
+        const response = await axios.post(
+            `https://${AzureOfficialAPI.endpoint}/translate`,
+            [{ text: encode(valuesForTranslation.join(Translate.sentenceDelimiter)) }],
+            AzureOfficialAPI.axiosConfig
+        );
         const value = (response as AzureTranslateResponse).data[0].translations[0].text;
         this.saveTranslation(decode(value), originalObject, saveTo);
-      })
-      .catch((error) => this.printAxiosError(error as AxiosError, saveTo));
-  };
+    };
 }

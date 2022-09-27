@@ -1,10 +1,10 @@
 {
-  "translation": {
-    "example": "hola, esto es un ejemplo",
-    "not-found": "Esta linea no está en el otro fichero",
-    "complex": {
-      "inner": "si"
-    }
-  },
-  "not-found-either": "Esta linea tampoco está en el otro fichero"
+    "translation": {
+        "example": "hola, esto es un ejemplo",
+        "not-found": "Esta linea no está en el otro fichero",
+        "complex": {
+            "inner": "si"
+        }
+    },
+    "not-found-either": "Esta linea tampoco está en el otro fichero"
 }

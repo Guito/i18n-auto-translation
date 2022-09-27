@@ -5,35 +5,31 @@ import { JSONObj, LectoTranslateResponse } from '../payload';
 import { Translate } from '../translate';
 
 export class LectoRapidAPI extends Translate {
-  private static readonly endpoint: string = 'lecto-translation.p.rapidapi.com';
-  private static readonly axiosConfig: AxiosRequestConfig = {
-    headers: {
-      'X-RapidAPI-Host': LectoRapidAPI.endpoint,
-      'X-RapidAPI-Key': argv.key,
-      'Content-Type': 'application/json',
-    },
-    responseType: 'json',
-  };
-
-  protected callTranslateAPI = (
-    valuesForTranslation: string[],
-    originalObject: JSONObj,
-    saveTo: string
-  ): void => {
-    axios
-      .post(
-        `https://${LectoRapidAPI.endpoint}/v1/translate/text`,
-        {
-          texts: [encode(valuesForTranslation.join(Translate.sentenceDelimiter))],
-          to: [argv.to],
-          from: argv.from,
+    private static readonly endpoint: string = 'lecto-translation.p.rapidapi.com';
+    private static readonly axiosConfig: AxiosRequestConfig = {
+        headers: {
+            'X-RapidAPI-Host': LectoRapidAPI.endpoint,
+            'X-RapidAPI-Key': argv.key,
+            'Content-Type': 'application/json'
         },
-        LectoRapidAPI.axiosConfig
-      )
-      .then((response) => {
+        responseType: 'json'
+    };
+
+    protected callTranslateAPI = async (
+        valuesForTranslation: string[],
+        originalObject: JSONObj,
+        saveTo: string
+    ): Promise<void> => {
+        const response = await axios.post(
+            `https://${LectoRapidAPI.endpoint}/v1/translate/text`,
+            {
+                texts: [encode(valuesForTranslation.join(Translate.sentenceDelimiter))],
+                to: [argv.to],
+                from: argv.from
+            },
+            LectoRapidAPI.axiosConfig
+        );
         const value = (response as LectoTranslateResponse).data.translations[0].translated[0];
         this.saveTranslation(decode(value), originalObject, saveTo);
-      })
-      .catch((error) => this.printAxiosError(error as AxiosError, saveTo));
-  };
+    };
 }

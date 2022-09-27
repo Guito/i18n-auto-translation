@@ -10,30 +10,30 @@ import { Translate } from './translate';
 import { DeeplAPI } from './providers/deepl-api';
 
 interface Providers {
-  'google-official': GoogleOfficialAPI;
-  'azure-official': AzureOfficialAPI;
-  'azure-rapid': AzureRapidAPI;
-  'deep-rapid': DeepRapidAPI;
-  deepl: DeeplAPI;
-  'just-rapid': JustRapidAPI;
-  'lecto-rapid': LectoRapidAPI;
-  'lingvanex-rapid': LingvanexRapidAPI;
-  'nlp-rapid': NLPRapidAPI;
+    'google-official': GoogleOfficialAPI;
+    'azure-official': AzureOfficialAPI;
+    'azure-rapid': AzureRapidAPI;
+    'deep-rapid': DeepRapidAPI;
+    deepl: DeeplAPI;
+    'just-rapid': JustRapidAPI;
+    'lecto-rapid': LectoRapidAPI;
+    'lingvanex-rapid': LingvanexRapidAPI;
+    'nlp-rapid': NLPRapidAPI;
 }
 
 export class TranslateSupplier {
-  private static readonly providers: Providers = {
-    'google-official': new GoogleOfficialAPI(),
-    'azure-official': new AzureOfficialAPI(),
-    'azure-rapid': new AzureRapidAPI(),
-    'deep-rapid': new DeepRapidAPI(),
-    deepl: new DeeplAPI(),
-    'just-rapid': new JustRapidAPI(),
-    'lecto-rapid': new LectoRapidAPI(),
-    'lingvanex-rapid': new LingvanexRapidAPI(),
-    'nlp-rapid': new NLPRapidAPI(),
-  };
+    private static readonly providers: Providers = {
+        'google-official': new GoogleOfficialAPI(),
+        'azure-official': new AzureOfficialAPI(),
+        'azure-rapid': new AzureRapidAPI(),
+        'deep-rapid': new DeepRapidAPI(),
+        deepl: new DeeplAPI(),
+        'just-rapid': new JustRapidAPI(),
+        'lecto-rapid': new LectoRapidAPI(),
+        'lingvanex-rapid': new LingvanexRapidAPI(),
+        'nlp-rapid': new NLPRapidAPI()
+    };
 
-  public static getProvider = (provider: string): Translate =>
-    TranslateSupplier.providers[provider as keyof Providers];
+    public static getProvider = (provider: string): Translate =>
+        TranslateSupplier.providers[provider as keyof Providers];
 }

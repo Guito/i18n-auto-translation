@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "homepage": "https://github.com/while1618/i18n-auto-translation",
-  "bin": "dist/index.js",
+  "bin": "dist/src/index.js",
   "files": [
     "dist"
   ],

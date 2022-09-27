@@ -5,36 +5,24 @@ import { JSONObj } from '../payload';
 import { Translate } from '../translate';
 
 interface ErrorResponse {
-  response: { statusCode: number; statusMessage: string };
-  errors: [{ message: string }];
+    response: { statusCode: number; statusMessage: string };
+    errors: [{ message: string }];
 }
 
 export class GoogleOfficialAPI extends Translate {
-  protected callTranslateAPI = (
-    valuesForTranslation: string[],
-    originalObject: JSONObj,
-    saveTo: string
-  ): void => {
-    new GoogleTranslate({ key: argv.key })
-      .translate(encode(valuesForTranslation.join(Translate.sentenceDelimiter)), {
-        from: argv.from,
-        to: argv.to,
-      })
-      .then((response) => {
+    protected callTranslateAPI = async (
+        valuesForTranslation: string[],
+        originalObject: JSONObj,
+        saveTo: string
+    ): Promise<void> => {
+        const response = await new GoogleTranslate({ key: argv.key }).translate(
+            encode(valuesForTranslation.join(Translate.sentenceDelimiter)),
+            {
+                from: argv.from,
+                to: argv.to
+            }
+        );
         const value = response[0];
         this.saveTranslation(decode(value), originalObject, saveTo);
-      })
-      .catch((error) => {
-        const err = error as ErrorResponse;
-        const errorFilePath = saveTo.replace(`${argv.to}.json`, `${argv.from}.json`);
-        console.error(`Request error for file: ${errorFilePath}`);
-        if (err.response?.statusCode && err.response.statusMessage && err.errors[0].message) {
-          console.log(`Status Code: ${err.response.statusCode}`);
-          console.log(`Status Text: ${err.response.statusMessage}`);
-          console.log(`Data: ${JSON.stringify(err.errors[0].message)}`);
-        } else {
-          console.log(error);
-        }
-      });
-  };
+    };
 }
