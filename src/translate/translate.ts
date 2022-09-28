@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios';
 import { addedDiff, deletedDiff } from 'deep-object-diff';
 import fs from 'fs';
 import glob from 'glob';
@@ -22,7 +21,7 @@ export abstract class Translate {
         toDelete: {}
     };
 
-    public translate = (): void => {
+    public translate = async (): Promise<void> => {
         if (this.argv.filePath && this.argv.dirPath)
             throw new Error('You should only provide a single file or a directory.');
 
@@ -30,23 +29,24 @@ export abstract class Translate {
             throw new Error('You must provide a single file or a directory.');
 
         if (this.argv.dirPath) this.translateFiles(this.argv.dirPath);
-        else if (this.argv.filePath) this.translateFile(this.argv.filePath);
+        else if (this.argv.filePath) await this.translateFile(this.argv.filePath);
     };
 
-    public getKeys = () => {
+    public getKeys = async (): Promise<any> => {
         this.keys = {
             toAdd: {},
             toDelete: {}
         };
         this.argv.testKeys = true;
-        if (this.argv.filePath && this.argv.dirPath)
+        if (this.argv.filePath && this.argv.dirPath) {
             throw new Error('You should only provide a single file or a directory.');
-
-        if (!this.argv.filePath && !this.argv.dirPath)
+        }
+        if (!this.argv.filePath && !this.argv.dirPath) {
             throw new Error('You must provide a single file or a directory.');
+        }
 
         if (this.argv.dirPath) this.translateFiles(this.argv.dirPath);
-        else if (this.argv.filePath) this.translateFile(this.argv.filePath);
+        else if (this.argv.filePath) await this.translateFile(this.argv.filePath);
         return this.keys;
     };
 
@@ -57,24 +57,29 @@ export abstract class Translate {
         });
         if (filePaths.length === 0) throw new Error(`0 files found for translation in ${dirPath}`);
         console.log(`${filePaths.length} files found.`);
-        filePaths.forEach((filePath) => this.translateFile(filePath));
+        filePaths.forEach(async (filePath) => await this.translateFile(filePath));
     };
 
-    private translateFile = (filePath: string): void => {
+    private translateFile = async (filePath: string): Promise<void> => {
         const fileForTranslation = JSON.parse(fs.readFileSync(filePath, 'utf-8')) as JSONObj;
         const saveTo: string = path.join(
             path.dirname(filePath),
             `${this.argv.baseName}${this.argv.to}.json`
         );
-        if (this.argv.override || !fs.existsSync(saveTo))
-            this.translationDoesNotExists(fileForTranslation, saveTo);
-        else this.translationAlreadyExists(fileForTranslation, saveTo);
+        if (this.argv.override || !fs.existsSync(saveTo)) {
+            await this.translationDoesNotExists(fileForTranslation, saveTo);
+        } else {
+            await this.translationAlreadyExists(fileForTranslation, saveTo);
+        }
     };
 
-    private translationAlreadyExists(fileForTranslation: JSONObj, saveTo: string): void {
+    private async translationAlreadyExists(
+        fileForTranslation: JSONObj,
+        saveTo: string
+    ): Promise<void> {
         const existingTranslation = JSON.parse(fs.readFileSync(saveTo, 'utf-8')) as JSONObj;
         this.deleteIfNeeded(fileForTranslation, existingTranslation, saveTo);
-        this.translateIfNeeded(fileForTranslation, existingTranslation, saveTo);
+        await this.translateIfNeeded(fileForTranslation, existingTranslation, saveTo);
     }
 
     private deleteIfNeeded = (
@@ -100,11 +105,11 @@ export abstract class Translate {
         }
     };
 
-    private translateIfNeeded = (
+    private translateIfNeeded = async (
         fileForTranslation: JSONObj,
         existingTranslation: JSONObj,
         saveTo: string
-    ): void => {
+    ): Promise<void> => {
         const diffForTranslation: JSONObj = addedDiff(
             existingTranslation,
             fileForTranslation
@@ -118,16 +123,19 @@ export abstract class Translate {
             return;
         }
         const valuesForTranslation: string[] = this.getValuesForTranslation(diffForTranslation);
-        this.callTranslateAPI(valuesForTranslation, diffForTranslation, saveTo);
+        await this.callTranslateAPI(valuesForTranslation, diffForTranslation, saveTo);
     };
 
-    private translationDoesNotExists(fileForTranslation: JSONObj, saveTo: string): void {
+    private async translationDoesNotExists(
+        fileForTranslation: JSONObj,
+        saveTo: string
+    ): Promise<void> {
         if (Object.keys(fileForTranslation).length === 0) {
             console.log(`Nothing to translate, file is empty: ${saveTo}`);
             return;
         }
         const valuesForTranslation: string[] = this.getValuesForTranslation(fileForTranslation);
-        this.callTranslateAPI(valuesForTranslation, fileForTranslation, saveTo);
+        await this.callTranslateAPI(valuesForTranslation, fileForTranslation, saveTo);
     }
 
     private getValuesForTranslation = (object: JSONObj): string[] => {
@@ -148,18 +156,6 @@ export abstract class Translate {
         originalObject: JSONObj,
         saveTo: string
     ) => Promise<void>;
-
-    protected printAxiosError = (error: AxiosError, saveTo: string): void => {
-        const errorFilePath = saveTo.replace(`${this.argv.to}.json`, `${this.argv.from}.json`);
-        console.error(`Request error for file: ${errorFilePath}`);
-        if (error.response?.status && error.response.statusText && error.response.data) {
-            console.log(`Status Code: ${error.response?.status}`);
-            console.log(`Status Text: ${error.response?.statusText}`);
-            console.log(`Data: ${JSON.stringify(error.response?.data)}`);
-        } else {
-            console.log(error.message);
-        }
-    };
 
     protected saveTranslation = (value: string, originalObject: JSONObj, saveTo: string): void => {
         let content: JSONObj = this.createTranslatedObject(
