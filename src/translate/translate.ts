@@ -86,6 +86,10 @@ export abstract class Translate {
             existingTranslation,
             fileForTranslation
         ) as JSONObj;
+        if (Object.keys(diffForDeletion).length === 0) {
+            console.log(`There is nothing to delete in: ${saveTo}`);
+            return;
+        }
         if (this.argv.testKeys) {
             this.keys.toDelete = diffForDeletion;
             return;
@@ -106,14 +110,14 @@ export abstract class Translate {
             fileForTranslation
         ) as JSONObj;
         if (Object.keys(diffForTranslation).length === 0) {
-            console.log(`Everything already translated for: ${saveTo}`);
+            console.log(`There is nothing to translate in: ${saveTo}`);
             return;
         }
-        const valuesForTranslation: string[] = this.getValuesForTranslation(diffForTranslation);
         if (this.argv.testKeys) {
             this.keys.toAdd = diffForTranslation;
             return;
         }
+        const valuesForTranslation: string[] = this.getValuesForTranslation(diffForTranslation);
         this.callTranslateAPI(valuesForTranslation, diffForTranslation, saveTo);
     };
 
