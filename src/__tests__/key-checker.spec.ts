@@ -12,7 +12,7 @@ describe('testKeys works correctly', () => {
             region: '',
             filePath: path.resolve(__dirname, 'main-es.json'),
             dirPath: '',
-            from: '',
+            from: 'es',
             to: 'en',
             override: false,
             baseName: 'main-',

@@ -24,8 +24,8 @@ export class DeeplAPI extends Translate {
             `https://${DeeplAPI.endpoint}/v2/translate`,
             querystring.stringify({
                 text: encode(valuesForTranslation.join(Translate.sentenceDelimiter)),
-                source_lang: this.argv.from.toUpperCase(),
-                target_lang: this.argv.to.toUpperCase()
+                source_lang: this.argv.from.toUpperCase().substring(0, 2),
+                target_lang: this.argv.to.toUpperCase().substring(0, 2)
             }),
             axiosConfig
         );

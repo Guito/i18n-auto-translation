@@ -23,7 +23,7 @@ describe('Translate with deepl works correctly', () => {
             region: '',
             filePath: path.resolve(__dirname, esTempFile),
             dirPath: '',
-            from: '',
+            from: 'es',
             to: 'en',
             override: false,
             baseName: 'main-',
