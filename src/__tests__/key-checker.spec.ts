@@ -4,7 +4,7 @@ import path from 'path';
 import { DeeplAPI } from '../translate/providers/deepl-api';
 
 describe('testKeys works correctly', () => {
-    test('When testing from ES to EN with testKeys, it should log them', () => {
+    test('When testing from ES to EN with testKeys, it should log them', async () => {
         const deeplAPI = new DeeplAPI();
         deeplAPI.argv = {
             apiProvider: 'deepl',
@@ -18,7 +18,7 @@ describe('testKeys works correctly', () => {
             baseName: 'main-',
             testKeys: true
         };
-        const keys = deeplAPI.getKeys();
+        const keys = await deeplAPI.getKeys();
         expect(keys).toEqual({
             toAdd: {
                 translation: {

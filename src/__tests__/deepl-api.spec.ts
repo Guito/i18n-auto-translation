@@ -15,7 +15,7 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Translate with deepl works correctly', () => {
-    test('When translating json from ES to EN, they should have the same keys at the end', () => {
+    test('When translating json from ES to EN, they should have the same keys at the end', async () => {
         const deeplAPI = new DeeplAPI();
         deeplAPI.argv = {
             apiProvider: 'deepl',
@@ -29,33 +29,39 @@ describe('Translate with deepl works correctly', () => {
             baseName: 'main-',
             testKeys: false
         };
-        fs.copyFileSync(path.resolve(__dirname, 'main-en.json'), path.resolve(__dirname, enTempFile));
-        fs.copyFileSync(path.resolve(__dirname, 'main-es.json'), path.resolve(__dirname, esTempFile));
+        fs.copyFileSync(
+            path.resolve(__dirname, 'main-en.json'),
+            path.resolve(__dirname, enTempFile)
+        );
+        fs.copyFileSync(
+            path.resolve(__dirname, 'main-es.json'),
+            path.resolve(__dirname, esTempFile)
+        );
         mockedAxios.post.mockResolvedValue({
             data: {
-                translations: {
-                    text: `This line is not in the other file${Translate.sentenceDelimiter}si${Translate.sentenceDelimiter}This line is not in the other file either`
-                }
+                translations: [
+                    {
+                        text: `This line is not in the other file${Translate.sentenceDelimiter}si${Translate.sentenceDelimiter}This line is not in the other file either`
+                    }
+                ]
             }
         } as DeepLResponse);
-        deeplAPI.translate();
-        setTimeout(() => {
-            expect(fs.readFileSync(path.resolve(__dirname, enTempFile), 'utf-8')).toEqual(
-                JSON.stringify(
-                    {
-                        translation: {
-                            example: 'Hello, this is an example',
-                            'not-found': 'This line is not in the other file',
-                            complex: {
-                                inner: 'si'
-                            }
-                        },
-                        'not-found-either': 'This line is not in the other file either'
+        await deeplAPI.translate();
+        expect(fs.readFileSync(path.resolve(__dirname, enTempFile), 'utf-8')).toEqual(
+            JSON.stringify(
+                {
+                    translation: {
+                        example: 'Hello, this is an example',
+                        'not-found': 'This line is not in the other file',
+                        complex: {
+                            inner: 'si'
+                        }
                     },
-                    null,
-                    2
-                )
-            );
-        }, 100);
+                    'not-found-either': 'This line is not in the other file either'
+                },
+                null,
+                4
+            )
+        );
     });
 });

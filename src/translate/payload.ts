@@ -13,7 +13,7 @@ export interface DeepTranslateResponse {
 }
 
 export interface DeepLResponse {
-    data: { translations: { text: string } };
+    data: { translations: [{ text: string }] };
 }
 
 export interface JustTranslateResponse {
